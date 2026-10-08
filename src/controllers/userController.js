@@ -72,9 +72,29 @@ const loginUser = async (req, res) => {
   }
 };
 
+// @desc    Get user profile (current logged-in user)
+// @route   GET /api/users/profile
+// @access  Private
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get all users
 // @route   GET /api/users
-// @access  Public
+// @access  Private/Admin
 const getUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -94,5 +114,6 @@ const getUsers = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
+  getUserProfile,
   getUsers,
 };
